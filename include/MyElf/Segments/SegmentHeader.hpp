@@ -25,45 +25,14 @@ struct SegmentHeader
 
   virtual void Read(std::istream& stream, bool elf64)
   {
-    if(!elf64)
-    {
-      U32 tmp;
-      MYELF_READ(stream, tmp);
-      this->Type = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->Offset = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->VAddress = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->PAddress = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->Filesz = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->Memsz = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->Flags = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->Align = tmp;
-    }
-    else
-    {
-      MYELF_READ(stream, this->Type);
-      MYELF_READ(stream, this->Offset);
-      MYELF_READ(stream, this->VAddress);
-      MYELF_READ(stream, this->PAddress);
-      MYELF_READ(stream, this->Filesz);
-      MYELF_READ(stream, this->Memsz);
-      MYELF_READ(stream, this->Flags);
-      MYELF_READ(stream, this->Align);
-    }
-
+    MYELF_READ_DIFF(stream, this->Type, U32, elf64);
+    MYELF_READ_DIFF(stream, this->Offset, U32, elf64);
+    MYELF_READ_DIFF(stream, this->VAddress, U32, elf64);
+    MYELF_READ_DIFF(stream, this->PAddress, U32, elf64);
+    MYELF_READ_DIFF(stream, this->Filesz, U32, elf64);
+    MYELF_READ_DIFF(stream, this->Memsz, U32, elf64);
+    MYELF_READ_DIFF(stream, this->Flags, U32, elf64);
+    MYELF_READ_DIFF(stream, this->Align, U32, elf64);
   }
 
 };

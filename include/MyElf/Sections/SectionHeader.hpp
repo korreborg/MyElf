@@ -47,46 +47,16 @@ struct SectionHeader
     MYELF_READ(stream, this->NameOffset);
     MYELF_READ(stream, this->Type);
 
-    if(!elf64)
-    {
-      U32 tmp;
-      MYELF_READ(stream, tmp);
-      this->Flags = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->Address = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->Offset = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->Size = tmp;
-    }
-    else
-    {
-      MYELF_READ(stream, this->Flags);
-      MYELF_READ(stream, this->Address);
-      MYELF_READ(stream, this->Offset);
-      MYELF_READ(stream, this->Size);
-    }
+    MYELF_READ_DIFF(stream, this->Flags, U32, elf64);
+    MYELF_READ_DIFF(stream, this->Address, U32, elf64);
+    MYELF_READ_DIFF(stream, this->Offset, U32, elf64);
+    MYELF_READ_DIFF(stream, this->Size, U32, elf64);
 
     MYELF_READ(stream, this->Link);
     MYELF_READ(stream, this->Info);
 
-    if(!elf64)
-    {
-      U32 tmp;
-      MYELF_READ(stream, tmp);
-      this->AddrAlign = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->EntSize = tmp;
-    }
-    else
-    {
-      MYELF_READ(stream, this->AddrAlign);
-      MYELF_READ(stream, this->EntSize);
-    }
+    MYELF_READ_DIFF(stream, this->AddrAlign, U32, elf64);
+    MYELF_READ_DIFF(stream, this->EntSize, U32, elf64);
 
   }
 };

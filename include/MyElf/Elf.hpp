@@ -94,24 +94,9 @@ struct ElfHeader
     MYELF_READ(stream, this->Machine);
     MYELF_READ(stream, this->Version);
 
-    if(!this->Elf64())
-    {
-      U32 tmp;
-      MYELF_READ(stream, tmp);
-      this->Entry = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->ProgramHeaderTableOffset = tmp;
-
-      MYELF_READ(stream, tmp);
-      this->SectionHeaderTableOffset = tmp;
-    }
-    else
-    {
-      MYELF_READ(stream, this->Entry);
-      MYELF_READ(stream, this->ProgramHeaderTableOffset);
-      MYELF_READ(stream, this->SectionHeaderTableOffset);
-    }
+    MYELF_READ_DIFF(stream, this->Entry, U32, this->Elf64());
+    MYELF_READ_DIFF(stream, this->ProgramHeaderTableOffset, U32, this->Elf64());
+    MYELF_READ_DIFF(stream, this->SectionHeaderTableOffset, U32, this->Elf64());
 
     MYELF_READ(stream, this->Flags);
     MYELF_READ(stream, this->HeaderSize);

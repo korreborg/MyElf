@@ -51,24 +51,18 @@ struct SymbolTable : public TableSection<SymbolEntry>
 {
   void ReadEntry(SymbolEntry& entry, std::istream& stream, bool elf64)
   {
+    MYELF_READ(stream, entry.NameOffset);
+
     if(!elf64)
     {
-      MYELF_READ(stream, entry.NameOffset);
-
-      U32 tmp32;
-      MYELF_READ(stream, tmp32);
-      entry.Value = tmp32;
-
-      MYELF_READ(stream, tmp32);
-      entry.Size = tmp32;
-
+      MYELF_READ_DIFF(stream, entry.Value, U32, elf64);
+      MYELF_READ_DIFF(stream, entry.Size, U32, elf64);
       MYELF_READ(stream, entry.Info);
       MYELF_READ(stream, entry.Other);
-      MYELF_READ(stream, entry.SectionHeaderIndex);
+      MYELF_READ_DIFF(stream, entry.SectionHeaderIndex, U8, elf64);
     }
     else
     {
-      MYELF_READ(stream, entry.NameOffset);
       MYELF_READ(stream, entry.Info);
       MYELF_READ(stream, entry.Other);
       MYELF_READ(stream, entry.SectionHeaderIndex);
