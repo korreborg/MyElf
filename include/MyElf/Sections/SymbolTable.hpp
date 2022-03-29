@@ -39,9 +39,16 @@
 
 struct SymbolEntry
 {
+  //why 32? i have no clue. 
+  //Every spec i've read says this variable should be 64 bits when aprsing elf64 
+  //objects, but it literally isn't. In every 64 bit elf object i've parsed its
+  //32 bits
   U32 NameOffset;
   U8  Info;
   U8  Other;
+
+  //again why 16 bit when every spec says it should be 32? 
+  //same reason as NameOffset...
   U16 SectionHeaderIndex;
   U64 Value;
   U64 Size;
