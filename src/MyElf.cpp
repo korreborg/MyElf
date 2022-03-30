@@ -205,6 +205,13 @@ int main(int argc, char** argv)
     return -1;
   }
 
+  if(file.bad() || file.fail())
+  {
+    std::cout << "Error: failed to parse file (stream went bad).\n";
+    return -1;
+  }
+
+
   if(verbose)
     std::cout << "[verbose] successfully parsed elf\n";
 
