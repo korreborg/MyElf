@@ -146,7 +146,7 @@ struct Elf
       }
 
 
-      //read newly allocated segment
+      //read newly allocated section
       this->Sections.back()->Read(stream, this->Header.Elf64());
 
 

@@ -12,9 +12,10 @@ class RawSection : public Section
 
     virtual void Read(std::istream& stream, bool elf64)
     {
-      (void)stream;
       (void)elf64;
-      MYELF_ASSERTW(false, "not implemented");
+
+      Bytes.resize(Section::Header.Size);
+      stream.read((char*)Bytes.data(), Bytes.size());
     }
 };
 

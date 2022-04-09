@@ -13,9 +13,10 @@ class RawSegment : public Segment
 
     void Read(std::istream& stream, bool elf64) override
     {
-      (void)stream;
       (void)elf64;
-      MYELF_ASSERTW(false, "not implemented");
+
+      Bytes.resize(Segment::Header.Filesz);
+      stream.read((char*)Bytes.data(), Bytes.size());
     }
 
 };
