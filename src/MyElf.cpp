@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 void PrintSymbolTables(const Elf& elf)
 {
@@ -189,8 +190,12 @@ int main(int argc, char** argv)
     return -1;
   }
 
+
   Elf elf;
+
+  auto t1 = std::chrono::system_clock::now();
   elf.Read(file);
+  auto t2 = std::chrono::system_clock::now();
 
   if(elf.Header.Ident.Mag0 != 0x4f && elf.Header.Ident.Mag1 != 'E' &&
      elf.Header.Ident.Mag2 != 'L' && elf.Header.Ident.Mag3 != 'F')
@@ -215,7 +220,11 @@ int main(int argc, char** argv)
 
 
   if(verbose)
-    std::cout << "[verbose] successfully parsed elf\n";
+  {
+    std::cout << "[verbose] successfully parsed elf in "
+    << (std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1).count() / 1000000.0f)
+    << "ms" << std::endl;
+  }
 
   if(elfHeader)
     PrintElfHeader(elf.Header);
