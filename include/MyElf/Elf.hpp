@@ -81,12 +81,22 @@ struct Elf
       //seek to segment offset
       stream.seekg(segHeader.Offset);
 
-      //allocate & emplace new segment poitner into vector
-      //(right now only raw segments are implemented. Not sure if more types are
-      //even needed)
-      this->Segments.emplace_back( 
+      //switch over segment type and allocate corrosponding section into vector
+      switch(segHeader.Type)
+      {
+         case PT_INTERP:
+         {
+           this->Segments.emplace_back( 
+                           std::make_shared<InterpSegment>(std::move(segHeader))
+                           );
+         }break;
+         default:
+         {
+           this->Segments.emplace_back( 
                               std::make_shared<RawSegment>(std::move(segHeader))
                               );
+         }break;
+      }
 
 
       //read newly allocated segment

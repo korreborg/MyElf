@@ -8,6 +8,24 @@
 #include <fstream>
 #include <chrono>
 
+void PrintInterpreter(const Elf& elf)
+{
+  int i = 0;
+  for(auto pSeg : elf.Segments)
+  {
+    SPtr<InterpSegment> interp = std::dynamic_pointer_cast<InterpSegment>(pSeg);
+
+    //skip if segment is not interp segment
+    if(interp == nullptr)
+      continue;
+
+    std::cout << "Segment #" << i << " [PT_INTERP]:\n";
+    std::cout << "  InterpreterPath: " << interp->InterpreterPath << std::endl;
+
+    i++;
+  }
+}
+
 void PrintSymbolTables(const Elf& elf)
 {
   int i = 0;
@@ -162,9 +180,10 @@ int main(int argc, char** argv)
   Args::Flag secHeaders{"--secheaders", "-s", "Print section headers"};
   Args::Flag progHeaders{"--progheaders", "-p", "Print program (segment) headers"};
   Args::Flag symbols{"--symboltable", "-y", "Print symbol tables"};
+  Args::Flag interp{"--interpreter", "-i", "Print interpreter if present"};
 
   Args::Parser parser{&help, &verbose, &elfHeader, &secHeaders, &progHeaders,
-                      &symbols};
+                      &symbols, &interp};
   parser.ParseFlags(argc, argv);
 
   if(help)
@@ -237,6 +256,9 @@ int main(int argc, char** argv)
 
   if(symbols)
     PrintSymbolTables(elf);
+
+  if(interp)
+    PrintInterpreter(elf);
 
   return 0;
 }
