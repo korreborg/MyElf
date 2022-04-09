@@ -1,29 +1,31 @@
 #pragma once
 
 #include "../Common.hpp"
-#include "./SectionHeader.hpp"
+#include "./Section.hpp"
 
-struct StringTable : public SectionHeader
+class StringTable : public Section
 {
-  std::vector<U8> Buffer;
+  public:
+    std::vector<U8> Buffer;
 
-  const char* GetStr(U32 offset)
-  {
-    if(offset >= Buffer.size())
-      return "\0";
+  public:
+    using Section::Section;
 
-    return (const char*)Buffer.data()+offset;
-  }
+    const char* GetStr(U32 offset)
+    {
+      if(offset >= Buffer.size())
+        return "\0";
 
-  void Read(std::istream& stream, bool elf64)
-  {
-    SectionHeader::Read(stream, elf64);
+      return (const char*)Buffer.data()+offset;
+    }
 
-    stream.seekg(SectionHeader::Offset, std::ios_base::beg);
+    void Read(std::istream& stream, bool elf64) override
+    {
+      (void)elf64;
 
-    Buffer.resize(SectionHeader::Size);
-    stream.read((char*)Buffer.data(), Buffer.size());
-  }
+      Buffer.resize(Section::Header.Size);
+      stream.read((char*)Buffer.data(), Buffer.size());
+    }
 
 };
 

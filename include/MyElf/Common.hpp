@@ -19,6 +19,9 @@ using SPtr = std::shared_ptr<T>;
 
 #define MYELF_ASSERT(cond, msg) std::cerr << msg << '\n'; assert(cond)
 
+//TODO: add debug line / file / etc info
+#define MYELF_ASSERTW(cond, msg) if(!(cond)){std::cerr << msg << '\n';}
+
 //For simply reading variables when the size is fixed regardless of elf64
 #define MYELF_READ(stream, var) stream.read((char*)&(var), sizeof(var))
 

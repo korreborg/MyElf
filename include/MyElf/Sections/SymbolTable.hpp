@@ -39,45 +39,42 @@
 
 struct SymbolEntry
 {
-  //why 32? i have no clue. 
-  //Every spec i've read says this variable should be 64 bits when aprsing elf64 
-  //objects, but it literally isn't. In every 64 bit elf object i've parsed its
-  //32 bits
   U32 NameOffset;
   U8  Info;
   U8  Other;
-
-  //again why 16 bit when every spec says it should be 32? 
-  //same reason as NameOffset...
   U16 SectionHeaderIndex;
   U64 Value;
   U64 Size;
 };
 
-struct SymbolTable : public TableSection<SymbolEntry>
+class SymbolTable : public TableSection<SymbolEntry>
 {
-  void ReadEntry(SymbolEntry& entry, std::istream& stream, bool elf64)
-  {
-    MYELF_READ(stream, entry.NameOffset);
+  public:
+    using TableSection<SymbolEntry>::TableSection;
 
-    if(!elf64)
+  protected:
+    void ReadEntry(SymbolEntry& entry, std::istream& stream, bool elf64) override
     {
-      MYELF_READ_DIFF(stream, entry.Value, U32, elf64);
-      MYELF_READ_DIFF(stream, entry.Size, U32, elf64);
-      MYELF_READ(stream, entry.Info);
-      MYELF_READ(stream, entry.Other);
-      MYELF_READ_DIFF(stream, entry.SectionHeaderIndex, U8, elf64);
-    }
-    else
-    {
-      MYELF_READ(stream, entry.Info);
-      MYELF_READ(stream, entry.Other);
-      MYELF_READ(stream, entry.SectionHeaderIndex);
-      MYELF_READ(stream, entry.Value);
-      MYELF_READ(stream, entry.Size);
-    }
+      MYELF_READ(stream, entry.NameOffset);
 
-  }
+      if(!elf64)
+      {
+        MYELF_READ_DIFF(stream, entry.Value, U32, elf64);
+        MYELF_READ_DIFF(stream, entry.Size, U32, elf64);
+        MYELF_READ(stream, entry.Info);
+        MYELF_READ(stream, entry.Other);
+        MYELF_READ_DIFF(stream, entry.SectionHeaderIndex, U8, elf64);
+      }
+      else
+      {
+        MYELF_READ(stream, entry.Info);
+        MYELF_READ(stream, entry.Other);
+        MYELF_READ(stream, entry.SectionHeaderIndex);
+        MYELF_READ(stream, entry.Value);
+        MYELF_READ(stream, entry.Size);
+      }
+
+    }
 
 };
 

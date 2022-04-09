@@ -42,7 +42,7 @@ struct SectionHeader
   U64 AddrAlign;
   U64 EntSize;
 
-  virtual void Read(std::istream& stream, bool elf64) 
+  void Read(std::istream& stream, bool elf64) 
   {
     MYELF_READ(stream, this->NameOffset);
     MYELF_READ(stream, this->Type);

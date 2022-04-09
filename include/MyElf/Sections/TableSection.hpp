@@ -1,24 +1,26 @@
 #pragma once
 
 #include "../Common.hpp"
-#include "SectionHeader.hpp"
+#include "Section.hpp"
 
 template <typename EntryT>
-struct TableSection : public SectionHeader
+class TableSection : public Section
 {
-  std::vector<EntryT> Entries;
+  public:
+    std::vector<EntryT> Entries;
 
+  protected:
   virtual void ReadEntry(EntryT& t, std::istream& stream, bool elf64) = 0;
 
-  void Read(std::istream& stream, bool elf64)
-  {
-    SectionHeader::Read(stream, elf64);
-    stream.seekg(SectionHeader::Offset);
+  public:
+  using Section::Section;
 
-    if(SectionHeader::EntSize == 0)
+  void Read(std::istream& stream, bool elf64) override
+  {
+    if(this->Header.EntSize == 0)
       return;
 
-    this->Entries.resize(SectionHeader::Size / SectionHeader::EntSize);
+    this->Entries.resize(this->Header.Size / this->Header.EntSize);
 
     for(EntryT& entry : this->Entries)
     {
@@ -27,11 +29,13 @@ struct TableSection : public SectionHeader
       auto p2 = stream.tellg();
 
       U64 nRead = p2-p1;
-      assert(nRead <= SectionHeader::EntSize);
+      MYELF_ASSERTW(nRead <= this->Header.EntSize, 
+                   "read more bytes than specifie by header \"EntSize\"");
 
-      if(nRead < SectionHeader::EntSize)
+      //seek forward diff of nRead-EntSize if we read less than EntSize
+      if(nRead < this->Header.EntSize)
       {
-        stream.seekg(SectionHeader::EntSize - nRead,
+        stream.seekg(this->Header.EntSize - nRead,
                      std::ios_base::cur);
       }
 

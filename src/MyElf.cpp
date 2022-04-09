@@ -10,14 +10,15 @@
 void PrintSymbolTables(const Elf& elf)
 {
   int i = 0;
-  for(auto secHeader : elf.Sections)
+  for(auto section : elf.Sections)
   {
-    SPtr<SymbolTable> symt = std::dynamic_pointer_cast<SymbolTable>(secHeader);
+    SPtr<SymbolTable> symt = std::dynamic_pointer_cast<SymbolTable>(section);
 
+    //skip if section is not a symbol table
     if(symt == nullptr)
       continue;
 
-    std::string symtName = elf.GetSectionHeaderName(symt->NameOffset, 
+    std::string symtName = elf.FindSectionName(section,
                                     std::string("Section #")+std::to_string(i));
 
     std::cout << symtName << ":\n";
@@ -28,7 +29,7 @@ void PrintSymbolTables(const Elf& elf)
     for(const SymbolEntry& symbol: symt->Entries)
     {
       SPtr<StringTable> symStrTable = 
-        std::dynamic_pointer_cast<StringTable>(elf.GetSectionByName(".strtab"));
+        std::dynamic_pointer_cast<StringTable>(elf.FindSectionByName(".strtab"));
 
       std::string groupName = std::string("Symbol #") + std::to_string(symi++) +
                            ": " + (symStrTable == nullptr ? "" : 
@@ -56,23 +57,21 @@ void PrintSymbolTables(const Elf& elf)
 void PrintProgramHeaderTable(const Elf& elf)
 {
   int i = 0;
-  for(auto segPtr : elf.Segments)
+  for(auto segment : elf.Segments)
   {
-    const SegmentHeader& Header = segPtr->Header;
-
     std::string groupName = "Segment #" + std::to_string(i++);
 
     PrintVarGroup
     {
       groupName.c_str(),
-      PRINT_VAR(Header.Type),
-      PRINT_VAR(Header.Offset),
-      PRINT_VAR(Header.VAddress),
-      PRINT_VAR(Header.PAddress),
-      PRINT_VAR(Header.Filesz),
-      PRINT_VAR(Header.Memsz),
-      PRINT_VAR(Header.Flags),
-      PRINT_VAR(Header.Align),
+      PRINT_VAR(segment->Header.Type),
+      PRINT_VAR(segment->Header.Offset),
+      PRINT_VAR(segment->Header.VAddress),
+      PRINT_VAR(segment->Header.PAddress),
+      PRINT_VAR(segment->Header.Filesz),
+      PRINT_VAR(segment->Header.Memsz),
+      PRINT_VAR(segment->Header.Flags),
+      PRINT_VAR(segment->Header.Align),
     };
     std::cout << std::endl;
 
@@ -82,30 +81,31 @@ void PrintProgramHeaderTable(const Elf& elf)
 void PrintSectionHeaderTable(const Elf& elf)
 {
   SPtr<StringTable> secStrTable = elf.GetSectionT<StringTable>(
-                                              elf.Header.SectionHeaderStrIndex);
+                                                elf.Header.SectionHeaderStrIndex
+                                                );
 
   int i = 0;
 
-  for(auto secHeader : elf.Sections)
+  for(auto section : elf.Sections)
   {
     std::string groupName = "Section #" + std::to_string(i) + 
       (secStrTable != nullptr? 
-      ": " + std::string(secStrTable->GetStr(secHeader->NameOffset)) : "");
+      ": " + std::string(secStrTable->GetStr(section->Header.NameOffset)) : "");
      
 
     PrintVarGroup
     {
       groupName.c_str(),
-      PRINT_VAR(secHeader->NameOffset),
-      PRINT_VAR(secHeader->Type),
-      PRINT_VAR(secHeader->Flags),
-      PRINT_VAR(secHeader->Address),
-      PRINT_VAR(secHeader->Offset),
-      PRINT_VAR(secHeader->Size),
-      PRINT_VAR(secHeader->Link),
-      PRINT_VAR(secHeader->Info),
-      PRINT_VAR(secHeader->AddrAlign),
-      PRINT_VAR(secHeader->EntSize),
+      PRINT_VAR(section->Header.NameOffset),
+      PRINT_VAR(section->Header.Type),
+      PRINT_VAR(section->Header.Flags),
+      PRINT_VAR(section->Header.Address),
+      PRINT_VAR(section->Header.Offset),
+      PRINT_VAR(section->Header.Size),
+      PRINT_VAR(section->Header.Link),
+      PRINT_VAR(section->Header.Info),
+      PRINT_VAR(section->Header.AddrAlign),
+      PRINT_VAR(section->Header.EntSize),
     };
     std::cout << std::endl;
     i++;

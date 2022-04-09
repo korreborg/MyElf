@@ -10,24 +10,28 @@
 struct Elf
 {
   ElfHeader Header;
-
-  std::vector< SPtr<SectionHeader> > Sections;
+  std::vector< SPtr<Section> > Sections;
   std::vector< SPtr<Segment> > Segments;
 
-  SPtr<SectionHeader> GetSectionByName(const char* name) const
+  SPtr<Section> FindSectionByName(const char* name) const
   {
-    for(auto secHeader : this->Sections)
+    for(auto section : this->Sections)
     {
-      std::string secName = this->GetSectionHeaderName(secHeader->NameOffset);
+      std::string secName = this->FindSectionName(section->Header.NameOffset);
 
       if(secName == name)
-        return secHeader;
+        return section;
     }
 
     return nullptr;
   }
 
-  std::string GetSectionHeaderName(U32 offset, std::string noname="null") const
+  std::string FindSectionName(SPtr<Section> pSection, std::string noname="null") const
+  {
+    return this->FindSectionName(pSection->Header.NameOffset, noname);
+  }
+
+  std::string FindSectionName(U32 offset, std::string noname="null") const
   {
     SPtr<StringTable> strtab = this->GetSectionT<StringTable>(
                                                    this->Header.SectionHeaderStrIndex);
@@ -86,7 +90,7 @@ struct Elf
 
 
       //read newly allocated segment
-      this->Segments.back()->Read(stream);
+      this->Segments.back()->Read(stream, this->Header.Elf64());
     }
 
   }
@@ -94,55 +98,58 @@ struct Elf
   void readSections(std::istream& stream)
   {
 
+    //pre-resize vector to needed size
     this->Sections.reserve(this->Header.NSectionEntries);
 
+    //loop over segment entries
     for(size_t i = 0; i < this->Header.NSectionEntries; i++)
     {
+      //seek to header offset
       stream.seekg(this->Header.SectionHeaderTableOffset + 
                    (i*this->Header.SectionHeaderSize));
 
+      //read header
+      SectionHeader secHeader;
+      secHeader.Read(stream, this->Header.Elf64());
 
-      //this is cringe but i have to know the type of the section
-      //before i initialize the object
-      //(NameIndex comes before type)
-      U32 SectionNameIndex;
-      U32 SectionType;
-      MYELF_READ(stream, SectionNameIndex);
-      MYELF_READ(stream, SectionType);
+      //seek to section offset
+      stream.seekg(secHeader.Offset);
 
-      //lole
-      stream.seekg(-8, std::ios_base::cur);
-
-      switch(SectionType)
+      //switch over section type and allocate corrosponding section into vector
+      switch(secHeader.Type)
       {
          case SHT_STRTAB:
          {
            this->Sections.emplace_back( 
-                                       std::make_shared<StringTable>()
-                                      );
+                             std::make_shared<StringTable>(std::move(secHeader))
+                             );
          }break;
          case SHT_SYMTAB:
          {
            this->Sections.emplace_back( 
-                                       std::make_shared<SymbolTable>()
-                                      );
+                             std::make_shared<SymbolTable>(std::move(secHeader))
+                             );
          }break;
          case SHT_REL:
          case SHT_RELA:
          {
            this->Sections.emplace_back( 
-                                       std::make_shared<RelocTable>()
-                                      );
+                              std::make_shared<RelocTable>(std::move(secHeader))
+                              );
          }break;
          default:
          {
-           this->Sections.emplace_back(
-                                       std::make_shared<SectionHeader>()
-                                      );
+           this->Sections.emplace_back( 
+                              std::make_shared<RawSection>(std::move(secHeader))
+                              );
          }break;
       }
 
+
+      //read newly allocated segment
       this->Sections.back()->Read(stream, this->Header.Elf64());
+
+
     }
 
   }

@@ -1,22 +1,21 @@
 #pragma once
 
-#include "Segment.hpp"
-#include "../Common.hpp"
+#include "Section.hpp"
 
-class RawSegment : public Segment
+class RawSection : public Section
 {
   public:
     std::vector<U8> Bytes;
 
   public:
-    using Segment::Segment;
+    using Section::Section;
 
-    void Read(std::istream& stream, bool elf64) override
+    virtual void Read(std::istream& stream, bool elf64)
     {
       (void)stream;
       (void)elf64;
       MYELF_ASSERTW(false, "not implemented");
     }
-
 };
+
 

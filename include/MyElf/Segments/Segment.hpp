@@ -11,7 +11,7 @@ class Segment
     Segment(SegmentHeader header={}) : Header{header} {}
     virtual ~Segment() = default;
 
-    virtual void Read(std::istream& stream) = 0;
+    virtual void Read(std::istream& stream, bool elf64) = 0;
 };
 
 
