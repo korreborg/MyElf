@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./TableSection.hpp"
+#include "TableSection.hpp"
 
 //Relocation types
 #define R

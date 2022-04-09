@@ -1,3 +1,3 @@
 #pragma once
 
-#include "./RawSegment.hpp"
+#include "RawSegment.hpp"

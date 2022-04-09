@@ -1,10 +1,10 @@
 #pragma once
 
 
-#include "./ElfHeader.hpp"
-#include "./Sections/Sections.hpp"
-#include "./Segments/Segments.hpp"
-#include "./Common.hpp"
+#include "ElfHeader.hpp"
+#include "Sections/Sections.hpp"
+#include "Segments/Segments.hpp"
+#include "Common.hpp"
 
 
 struct Elf

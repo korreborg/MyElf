@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./Segment.hpp"
+#include "Segment.hpp"
 #include "../Common.hpp"
 
 class RawSegment : public Segment
@@ -14,7 +14,6 @@ class RawSegment : public Segment
     void Read(std::istream& stream) override
     {
       (void)stream;
-      MYELF_ASSERT(false, "not implemented");
     }
 
 };

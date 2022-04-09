@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./SegmentHeader.hpp"
+#include "SegmentHeader.hpp"
 
 class Segment
 {

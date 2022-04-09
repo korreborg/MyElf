@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Common.hpp"
-#include "./SectionHeader.hpp"
+#include "SectionHeader.hpp"
 
 template <typename EntryT>
 struct TableSection : public SectionHeader

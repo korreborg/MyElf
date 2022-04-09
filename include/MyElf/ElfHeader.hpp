@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./Common.hpp"
+#include "Common.hpp"
 
 #define ELF_MAG0 0x7F
 #define ELF_MAG1 0x45

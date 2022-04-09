@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./TableSection.hpp"
+#include "TableSection.hpp"
 
 #define ELF32_ST_BIND(i)   ( (i)>>4 )
 #define ELF32_ST_TYPE(i)   ( (i)&0xF )
