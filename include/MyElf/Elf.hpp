@@ -12,7 +12,7 @@ struct Elf
   ElfHeader Header;
 
   std::vector< SPtr<SectionHeader> > Sections;
-  std::vector< SPtr<SegmentHeader> > Segments;
+  std::vector< SPtr<Segment> > Segments;
 
   SPtr<SectionHeader> GetSectionByName(const char* name) const
   {
@@ -60,20 +60,33 @@ struct Elf
 
   void readSegments(std::istream& stream)
   {
+    //pre-resize vector to needed size
     this->Segments.reserve(this->Header.NProgramEntries);
 
+    //loop over segment entries
     for(size_t i = 0; i < this->Header.NProgramEntries; i++)
     {
+      //seek to header offset
       stream.seekg(this->Header.ProgramHeaderTableOffset + 
                    (i*this->Header.ProgramHeaderSize));
 
-      //TODO: iterate type like readSections
-      this->Segments.emplace_back(
-                                  std::make_shared<SegmentHeader>()
-                                 );
+      //read header
+      SegmentHeader segHeader;
+      segHeader.Read(stream, this->Header.Elf64());
 
-      this->Segments.back()->Read(stream, this->Header.Elf64());
+      //seek to segment offset
+      stream.seekg(segHeader.Offset);
 
+      //allocate & emplace new segment poitner into vector
+      //(right now only raw segments are implemented. Not sure if more types are
+      //even needed)
+      this->Segments.emplace_back( 
+                              std::make_shared<RawSegment>(std::move(segHeader))
+                              );
+
+
+      //read newly allocated segment
+      this->Segments.back()->Read(stream);
     }
 
   }

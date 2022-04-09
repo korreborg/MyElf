@@ -56,21 +56,23 @@ void PrintSymbolTables(const Elf& elf)
 void PrintProgramHeaderTable(const Elf& elf)
 {
   int i = 0;
-  for(auto segHeader : elf.Segments)
+  for(auto segPtr : elf.Segments)
   {
+    const SegmentHeader& Header = segPtr->Header;
+
     std::string groupName = "Segment #" + std::to_string(i++);
 
     PrintVarGroup
     {
       groupName.c_str(),
-      PRINT_VAR(segHeader->Type),
-      PRINT_VAR(segHeader->Offset),
-      PRINT_VAR(segHeader->VAddress),
-      PRINT_VAR(segHeader->PAddress),
-      PRINT_VAR(segHeader->Filesz),
-      PRINT_VAR(segHeader->Memsz),
-      PRINT_VAR(segHeader->Flags),
-      PRINT_VAR(segHeader->Align),
+      PRINT_VAR(Header.Type),
+      PRINT_VAR(Header.Offset),
+      PRINT_VAR(Header.VAddress),
+      PRINT_VAR(Header.PAddress),
+      PRINT_VAR(Header.Filesz),
+      PRINT_VAR(Header.Memsz),
+      PRINT_VAR(Header.Flags),
+      PRINT_VAR(Header.Align),
     };
     std::cout << std::endl;
 

@@ -23,7 +23,7 @@ struct SegmentHeader
   U64 Flags;
   U64 Align;
 
-  virtual void Read(std::istream& stream, bool elf64)
+  void Read(std::istream& stream, bool elf64)
   {
     MYELF_READ_DIFF(stream, this->Type, U32, elf64);
     MYELF_READ_DIFF(stream, this->Offset, U32, elf64);

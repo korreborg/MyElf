@@ -17,6 +17,8 @@ using U64 = std::uint64_t;
 template <typename T>
 using SPtr = std::shared_ptr<T>;
 
+#define MYELF_ASSERT(cond, msg) std::cerr << msg << '\n'; assert(cond)
+
 //For simply reading variables when the size is fixed regardless of elf64
 #define MYELF_READ(stream, var) stream.read((char*)&(var), sizeof(var))
 
