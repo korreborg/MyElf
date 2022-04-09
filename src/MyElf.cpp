@@ -80,7 +80,7 @@ void PrintProgramHeaderTable(const Elf& elf)
 void PrintSectionHeaderTable(const Elf& elf)
 {
   SPtr<StringTable> secStrTable = elf.GetSectionT<StringTable>(
-                                                     elf.SectionHeaderStrIndex);
+                                              elf.Header.SectionHeaderStrIndex);
 
   int i = 0;
 
@@ -190,16 +190,16 @@ int main(int argc, char** argv)
   Elf elf;
   elf.Read(file);
 
-  if(elf.Ident.Mag0 != 0x4f && elf.Ident.Mag1 != 'E' &&
-     elf.Ident.Mag2 != 'L' && elf.Ident.Mag3 != 'F')
+  if(elf.Header.Ident.Mag0 != 0x4f && elf.Header.Ident.Mag1 != 'E' &&
+     elf.Header.Ident.Mag2 != 'L' && elf.Header.Ident.Mag3 != 'F')
   {
     std::cout << "Error: invalid elf file\n";
 
     if(verbose)
     {
       std::cout << "[verbose] invalid magic identity bytes: " << std::hex;
-      std::cout << (int)elf.Ident.Mag0 << ' ' << (int)elf.Ident.Mag1 << ' ' 
-                << (int)elf.Ident.Mag2 << ' ' << (int)elf.Ident.Mag3 << '\n';
+      std::cout << (int)elf.Header.Ident.Mag0 << ' ' << (int)elf.Header.Ident.Mag1 << ' ' 
+                << (int)elf.Header.Ident.Mag2 << ' ' << (int)elf.Header.Ident.Mag3 << '\n';
     }
 
     return -1;
@@ -216,7 +216,7 @@ int main(int argc, char** argv)
     std::cout << "[verbose] successfully parsed elf\n";
 
   if(elfHeader)
-    PrintElfHeader(elf);
+    PrintElfHeader(elf.Header);
 
   if(secHeaders)
     PrintSectionHeaderTable(elf);
