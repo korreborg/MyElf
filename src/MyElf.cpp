@@ -8,6 +8,47 @@
 #include <fstream>
 #include <chrono>
 
+void PrintRelocTable(const Elf& elf)
+{
+  int i = -1;
+  for(auto pSec : elf.Sections)
+  {
+    i++;
+    SPtr<RelocTable> pRelocTab= std::dynamic_pointer_cast<RelocTable>(pSec);
+
+    //skip if section is not a reloc table
+    if(pRelocTab== nullptr)
+      continue;
+
+    std::string relocName = elf.FindSectionName(pRelocTab,
+                                    std::string("Section #")+std::to_string(i));
+
+    std::cout << relocName<< ":\n";
+    std::cout << "--------------------\n";
+
+    int entryI = 0;
+    for(const RelocEntry& entry : pRelocTab->Entries)
+    {
+      std::string entryName{"Reloc #"};
+      entryName += std::to_string(entryI);
+
+      PrintVarGroup
+      {
+        entryName.c_str(),
+        PRINT_VAR(entry.Offset),
+        PRINT_VAR(entry.Info),
+        PRINT_VAR(entry.Addend),
+      };
+      std::cout << std::endl;
+
+      entryI++;
+    }
+
+  }
+
+
+}
+
 void PrintInterpreter(const Elf& elf)
 {
   int i = -1;
@@ -182,9 +223,10 @@ int main(int argc, char** argv)
   Args::Flag progHeaders{"--progheaders", "-p", "Print program (segment) headers"};
   Args::Flag symbols{"--symboltable", "-y", "Print symbol tables"};
   Args::Flag interp{"--interpreter", "-i", "Print interpreter if present"};
+  Args::Flag relocs{"--reloctable", "-r", "Print relocation tables"};
 
   Args::Parser parser{&help, &verbose, &elfHeader, &secHeaders, &progHeaders,
-                      &symbols, &interp};
+                      &symbols, &interp, &relocs};
   parser.ParseFlags(argc, argv);
 
   if(help)
@@ -260,6 +302,9 @@ int main(int argc, char** argv)
 
   if(interp)
     PrintInterpreter(elf);
+
+  if(relocs)
+    PrintRelocTable(elf);
 
   return 0;
 }
