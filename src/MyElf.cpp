@@ -10,9 +10,11 @@
 
 void PrintInterpreter(const Elf& elf)
 {
-  int i = 0;
+  int i = -1;
   for(auto pSeg : elf.Segments)
   {
+    i++;
+
     SPtr<InterpSegment> interp = std::dynamic_pointer_cast<InterpSegment>(pSeg);
 
     //skip if segment is not interp segment
@@ -22,15 +24,15 @@ void PrintInterpreter(const Elf& elf)
     std::cout << "Segment #" << i << " [PT_INTERP]:\n";
     std::cout << "  InterpreterPath: " << interp->InterpreterPath << std::endl;
 
-    i++;
   }
 }
 
 void PrintSymbolTables(const Elf& elf)
 {
-  int i = 0;
+  int i = -1;
   for(auto section : elf.Sections)
   {
+    i++;
     SPtr<SymbolTable> symt = std::dynamic_pointer_cast<SymbolTable>(section);
 
     //skip if section is not a symbol table
@@ -68,7 +70,6 @@ void PrintSymbolTables(const Elf& elf)
 
     }
 
-    i++;
   }
 
 }
