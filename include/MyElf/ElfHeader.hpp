@@ -64,7 +64,7 @@ struct ElfHeader
   U16 NSectionEntries;
   U16 SectionHeaderStrIndex;
 
-  bool Elf64()
+  bool Elf64() const
   {
     return (Ident.Class == ELFCLASS64);
   }

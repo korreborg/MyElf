@@ -26,11 +26,29 @@ void PrintRelocTable(const Elf& elf)
     std::cout << relocName<< ":\n";
     std::cout << "--------------------\n";
 
+    SPtr<SymbolTable> pSymTab = std::dynamic_pointer_cast<SymbolTable>(
+                                              elf.FindSectionByName(".symtab"));
+    SPtr<StringTable> pStrTab = std::dynamic_pointer_cast<StringTable>(
+                                              elf.FindSectionByName(".strtab"));
+
+
     int entryI = 0;
     for(const RelocEntry& entry : pRelocTab->Entries)
     {
       std::string entryName{"Reloc #"};
       entryName += std::to_string(entryI);
+
+      if(pSymTab != nullptr && pStrTab != nullptr)
+      {
+        int index = elf.Header.Elf64() ? 
+                    ELF64_R_SYM(entry.Info) : ELF32_R_SYM(entry.Info);
+
+        std::string symbolName = 
+          std::string(pStrTab->GetStr(pSymTab->Entries[index].NameOffset));
+
+        entryName += std::string(": ") + symbolName;
+      }
+
 
       PrintVarGroup
       {
